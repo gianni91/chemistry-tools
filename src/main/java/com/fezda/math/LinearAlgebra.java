@@ -83,16 +83,18 @@ public class LinearAlgebra {
 	private static void rearrangeRows (double[][] matrix) {
 		for (int r = 0; r < matrix.length; r++) {
 			if (matrix[r][r] == 0) {
-				for (int r2 = r+1; r2 < matrix.length;r2++) {
-					if (matrix[r2][r] != 0 ) {
+				for (int r2 = 0; r2 < matrix.length; r2++) {
+					if (r2 != r && matrix[r2][r] != 0 && !(matrix[r][r2] == 0 && r2 < r)) {
 						swapRows(matrix,r,r2);
 						break;
 					}
-					else {
-						System.out.println("Failed: first " + matrix[r2][r] + ", other = " + matrix[r][r2]);
-					}
 				}
-				if (matrix[r][r] == 0) System.out.println("Warning: No remaining rows to swap with");
+			}
+		}
+		for (int r = 0; r < matrix.length; r++) {
+			if (matrix[r][r] == 0) {
+				//throw (new IllegalStateException("Matrix rows still have 0 on the diagonal"));
+				System.out.println("Warning: Failed to arrange matrix rows to prevent zeros at the diagonal");
 			}
 		}
 	}

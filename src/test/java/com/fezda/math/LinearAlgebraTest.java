@@ -103,10 +103,27 @@ public class LinearAlgebraTest {
 	
 	@Test
 	public void testSolveSimpleSystemOfEquations11() {
-		double [][] system = new double[][] {{0,1,0,2},{1,0,1,4},{1,0,0,1}};
+		double [][] system = new double[][] {{0,1,1,5},{1,0,0,1},{1,2,0,5}};
 		double [] result = LinearAlgebra.solveSimpleSystemOfEquations(system);
 		double [] expected = new double[] {1,2,3};
-		assertArrayEquals(expected, result, "Fails when first swap takes only row containing last var");
+		assertArrayEquals(expected, result, "Fails when earlier swap takes only row containing a later variable");
 	}
+	
+	@Test
+	public void testSolveSimpleSystemOfEquations12() {
+		double [][] system = new double[][] {{1,0,1,4},{0,1,1,5},{0,1,0,2}};
+		double [] result = LinearAlgebra.solveSimpleSystemOfEquations(system);
+		double [] expected = new double[] {1,2,3};
+		assertArrayEquals(expected, result, "Fails when first swap is swapped back to fix last row");
+	}
+	
+	@Test
+	public void testSolveSimpleSystemOfEquations13() {
+		double [][] system = new double[][] {{1,2,3,14},{0,1,2,8},{0,0,1,3}};
+		double [] result = LinearAlgebra.solveSimpleSystemOfEquations(system);
+		double [] expected = new double[] {1,2,3};
+		assertArrayEquals(expected, result, "Fails when can't satisfy both positions' requirements with 1 swap");
+	}
+	
 	
 }
