@@ -1,6 +1,6 @@
 package com.fezda.math;
 
-public class LinearAlgebra {
+public class SystemOfEquations {
 	
 	public static double [][] getCopy (double [][] matrix) {
 		double[][] result = new double[matrix.length][matrix[0].length];
@@ -70,8 +70,8 @@ public class LinearAlgebra {
 		scaleRow(matrix, rowIndex1, 1/scaleBy);
 	}
 	
+	// Converts from REF (row echelon form) to RREF (reduced REF)
 	private static void simpleBackSubstitution (double[][] matrix) {
-		// Do this when already in row echelon form
 		for (int r = matrix.length-1; r > 0; r--) {
 			for (int r2 = r-1; r2 > -1; r2--) {
 				if (matrix[r2][r] != 0) addScaledRowTo(matrix,r,r2,-1*matrix[r2][r]);
@@ -108,7 +108,6 @@ public class LinearAlgebra {
 			}
 			if (matrix[r][r] != 0) scaleRow(matrix,r,1/matrix[r][r]);
 		}
-		
 		simpleBackSubstitution(matrix);
 	}
 	
@@ -122,7 +121,6 @@ public class LinearAlgebra {
 			System.out.println("Warning: More equations than variables in systems of equations matrix, ignoring last " + (matrix.length - matrix[0].length + 1));
 			moddable = getCropped(moddable, matrix[0].length-1, matrix[0].length);
 		}
-		
 		simpleGaussianElimination(moddable);
 		
 		double[] result = new double[moddable.length];

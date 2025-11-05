@@ -1,5 +1,7 @@
 package com.fezda.chemistry;
 
+import java.util.HashSet;
+
 public class EquationSide {
 	
 	public static void main (String[] args) {
@@ -37,9 +39,29 @@ public class EquationSide {
 	
 	public void display() {
 		for (int i = 0; i < molecules.length; i++) {
+			if (i!=0) System.out.print(" + ");
 			System.out.print(quantities[i] == 1 ? "" : quantities[i]);
 			molecules[i].display();
-			System.out.println();
 		}
+	}
+	
+	public int getLength() {
+		return molecules.length;
+	}
+	
+	public String[] getElements () {
+		HashSet<String> elements = new HashSet<String>();
+		for (int m = 0; m < molecules.length; m++) {
+			String [] els = molecules[m].getElements();
+			for (int el = 0; el < els.length; el++) {
+				elements.add(els[el]);
+			}
+		}
+		String[] result = new String [elements.size()];
+		return elements.toArray(result);
+	}
+	
+	public Molecule[] getMolecules() {
+		return this.molecules;
 	}
 }
