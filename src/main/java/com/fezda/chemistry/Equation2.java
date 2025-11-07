@@ -5,51 +5,65 @@ import java.util.HashSet;
 
 import com.fezda.math.SystemOfEquations;
 
-public class Equation {
+/***************
+ * Alternative version of Equation that stores reactants and products separately
+ **************/
+public class Equation2 {
 	
 	public static void main (String[] args) {
 		String eq = "C8H18 + O2 -> H2O + CO2";
-		Equation equation = new Equation(eq);
+		Equation2 equation = new Equation2(eq);
 		equation.display();
 		equation.balance();
 		equation.display();
 		equation.display(false);
 	}
 	
-	private Molecule[] molecules;
-	private int numReactants;
+	private Molecule[] reactants;
+	private Molecule[] products;
 	private int[] coefficients;		// Stoichiometric coefficients when balanced
 	
-	public Equation (String equation) {
+	public Equation2 (String equation) {
 		String trimmed = equation.replace(" ", "");
 		String[] sides = trimmed.split("->");
-		String[][] parts = new String[2][];
-		parts[0] = sides[0].split("\\+");
-		parts[1] = sides[1].split("\\+");
 		
-		molecules = new Molecule[parts[0].length + parts[1].length];
-		coefficients = new int[parts[0].length + parts[1].length];
+		int[][] sideCoefficients = new int[2][];
+		Molecule[][] molecules = new Molecule[2][];
 		
 		boolean hasCoeffs = false;
 		for (int side = 0; side < 2; side++) {
-			if (side == 0) numReactants = parts.length;
+			String[] parts = sides[side].split("\\+");
+			molecules[side] = new Molecule[parts.length];
+			sideCoefficients[side] = new int[parts.length];
 			
 			for (int i = 0; i < parts.length; i++) {
-				if ( Character.isDigit(parts[side][i].charAt(0)) ) {
+				if ( Character.isDigit(parts[i].charAt(0)) ) {
 					hasCoeffs = true;
 					int splitIndex = 0;
-					for (int c = 0; c < parts[side][i].length(); c++) {
-						if (!Character.isDigit(parts[side][i].charAt(c))) {
+					for (int c = 0; c < parts[i].length(); c++) {
+						if (!Character.isDigit(parts[i].charAt(c))) {
 							splitIndex = c;
 							break;
 						}
 					}
-					molecules[i+side*numReactants] = new Molecule(parts[side][i].substring(splitIndex));
-					coefficients[i+side*numReactants] = Integer.parseInt(parts[side][i].substring(0,splitIndex));
+					molecules[side][i] = new Molecule(parts[i].substring(splitIndex));
+					sideCoefficients[side][i] = Integer.parseInt(parts[i].substring(0,splitIndex));
 				} else {
-					molecules[i+side*numReactants] = new Molecule(parts[side][i]);
-					coefficients[i+side*numReactants] = 1;
+					molecules[side][i] = new Molecule(parts[i]);
+					sideCoefficients[side][i] = 1;
 				}
+			}
+		}
+		reactants = molecules[0];
+		products = molecules[1];
+		
+		if (hasCoeffs) {
+			coefficients = new int[sideCoefficients[0].length + sideCoefficients[1].length];
+			for (int i = 0; i < sideCoefficients[0].length; i++) {
+				coefficients[i] = sideCoefficients[0][i];
+			}
+			for (int i = 0; i < sideCoefficients[1].length; i++) {
+				coefficients[i+sideCoefficients[0].length] = sideCoefficients[1][i];
 			}
 		}
 	}
@@ -70,16 +84,18 @@ public class Equation {
 		display(true);
 	}
 	public void display (boolean includeCoeffs) {
-		for (int i = 0; i < molecules.length; i++) {
-			if (i!=0) {
-				if (i == numReactants) 
-					System.out.print(" -> ");
-				else 
-					System.out.print(" + ");
-			}
+		for (int i = 0; i < reactants.length; i++) {
+			if (i!=0) System.out.print(" + ");
 			if (coefficients != null && includeCoeffs) 
 				System.out.print(coefficients[i] == 1 ? "" : coefficients[i]);
-			molecules[i].display();
+			reactants[i].display();
+		}
+		System.out.print(" -> ");
+		for (int i = 0; i < products.length; i++) {
+			if (i!=0) System.out.print(" + ");
+			if (coefficients != null &&includeCoeffs) 
+				System.out.print(coefficients[i+reactants.length] == 1 ? "" : coefficients[i+reactants.length]);
+			products[i].display();
 		}
 		System.out.println();
 	}
@@ -88,18 +104,29 @@ public class Equation {
 	 * Use Bottomley's Method to balance a chemical equation
 	 **************/
 	public void balance() {
-		String [] elements = this.getElements(molecules);
-		double[][] sysOfEqMatrix = new double[elements.length + 1][molecules.length+ 1];
-		for (int mol = 0; mol < molecules.length; mol++) {
-			HashMap<String,Integer> molElCounts = molecules[mol].getElementCounts();
+		String [] elements = this.getElements(reactants);
+		int rhsStart = reactants.length;
+		double[][] sysOfEqMatrix = new double[elements.length + 1][reactants.length+products.length+ 1];
+		for (int mol = 0; mol < reactants.length; mol++) {
+			HashMap<String,Integer> molElCounts = reactants[mol].getElementCounts();
 			for (int el = 0; el < elements.length; el++) {
 				if (molElCounts.containsKey(elements[el])) {
 					sysOfEqMatrix[el][mol] = molElCounts.get(elements[el]);
-					if (mol >= numReactants)
-						sysOfEqMatrix[el][mol] = sysOfEqMatrix[el][mol] * -1;		// Note: This makes products negative so that a + b = c + d  becomes a + b - c - d = 0
 				}
-				else
+				else {
 					sysOfEqMatrix[el][mol] = 0;
+				}
+			}
+		}
+		for (int mol2 = 0; mol2 < products.length; mol2++) {
+			HashMap<String,Integer> molElCounts = products[mol2].getElementCounts();
+			for (int el = 0; el < elements.length; el++) {
+				if (molElCounts.containsKey(elements[el])) {
+					sysOfEqMatrix[el][rhsStart+mol2] = -1 * molElCounts.get(elements[el]);
+				}
+				else {
+					sysOfEqMatrix[el][rhsStart+mol2] = 0;
+				}
 			}
 		}
 		
@@ -107,11 +134,10 @@ public class Equation {
 		sysOfEqMatrix[elements.length][0] = 1;
 		sysOfEqMatrix[elements.length][sysOfEqMatrix.length] = 1;
 		
-		//displayMatrix(sysOfEqMatrix, elements);
+//		displayMatrix(sysOfEqMatrix, elements);
 		
 		double[] dCoefficients  = SystemOfEquations.solveSimpleSystemOfEquations(sysOfEqMatrix);
-		if (hasFractions(dCoefficients))
-			dCoefficients = getScaledToWholeNums(dCoefficients);
+		if (hasFractions(dCoefficients)) dCoefficients = getScaledToWholeNums(dCoefficients);
 		this.coefficients = toIntArray(dCoefficients);
 	}
 	private static void displayMatrix(double[][] sysOfEqMatrix, String[] elements) {
