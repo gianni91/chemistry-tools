@@ -19,6 +19,10 @@ public class Chemistry {
 		lr.display();
 		System.out.println();
 		
+		double[] masses = chem.getProductMasses(new double[] {13,22},equation);
+		for (int i = 0; i < masses.length; i++) {
+			System.out.println(masses[i]);
+		}
 	}
 	
 	private PeriodicTable pTable;
@@ -56,5 +60,16 @@ public class Chemistry {
 		}
 		return lr;
 	}
-
+	
+	public double[] getProductMasses (double[] reactantMasses, Equation eq) {
+		if (reactantMasses.length != eq.getNumReactants()) throw new IllegalArgumentException("Number of reactants is masses list must match number in equation");
+		int lrIndex = getLimitingReagentIndex(reactantMasses, eq);
+		
+		double outputNum = getMolesByMass(reactantMasses[lrIndex], eq.getMolecules()[lrIndex]) / eq.getCoefficients()[lrIndex];
+		double[] result = new double[eq.getNumProducts()];
+		for (int p = 0; p < result.length; p++) {
+			result[p] = getMolarMass(eq.getMolecules()[eq.getNumReactants()+p]) * eq.getCoefficients()[eq.getNumReactants()+p] * outputNum;
+		}
+		return result;
+	}
 }
