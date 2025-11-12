@@ -11,7 +11,7 @@ public class PeriodicTableTest {
 		assertEquals(He.getNumber(), 2);
 		assertEquals(He.getSymbol(), "He");
 		assertEquals(He.getName(), "Helium");
-		assertEquals(He.getWeight(), 4.0026f);
+		assertEquals(He.getWeight(), 4.0026);
 		assertEquals(He.getPeriod(), 1);
 		assertEquals(He.getGroup(), 18);
 	}
@@ -23,7 +23,7 @@ public class PeriodicTableTest {
 		assertEquals(He.getNumber(), 2);
 		assertEquals(He.getSymbol(), "He");
 		assertEquals(He.getName(), "Helium");
-		assertEquals(He.getWeight(), 4.0026f);
+		assertEquals(He.getWeight(), 4.0026);
 		assertEquals(He.getPeriod(), 1);
 		assertEquals(He.getGroup(), 18);
 	}

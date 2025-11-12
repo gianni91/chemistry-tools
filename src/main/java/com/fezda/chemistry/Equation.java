@@ -18,6 +18,7 @@ public class Equation {
 	
 	private Molecule[] molecules;
 	private int numReactants;
+	private int numProducts;
 	private int[] coefficients;		// Stoichiometric coefficients when balanced
 	
 	public Equation (String equation) {
@@ -29,12 +30,14 @@ public class Equation {
 		
 		molecules = new Molecule[parts[0].length + parts[1].length];
 		coefficients = new int[parts[0].length + parts[1].length];
+		numReactants = parts[0].length;
+		numProducts = parts[1].length;
 		
 		boolean hasCoeffs = false;
 		for (int side = 0; side < 2; side++) {
-			if (side == 0) numReactants = parts.length;
+//			if (side == 0) numReactants = parts.length;
 			
-			for (int i = 0; i < parts.length; i++) {
+			for (int i = 0; i < parts[side].length; i++) {
 				if ( Character.isDigit(parts[side][i].charAt(0)) ) {
 					hasCoeffs = true;
 					int splitIndex = 0;
@@ -54,7 +57,7 @@ public class Equation {
 		}
 	}
 	
-	public String[] getElements (Molecule[] molecules) {
+	public static String[] getElements (Molecule[] molecules) {
 		HashSet<String> elements = new HashSet<String>();
 		for (int m = 0; m < molecules.length; m++) {
 			String [] els = molecules[m].getElements();
@@ -161,4 +164,21 @@ public class Equation {
 		}
 	}
 	
+	public int getNumReactants () {
+		return numReactants;
+	}
+	
+	public int getNumProducts () {
+		return numProducts;
+	}
+	
+	public Molecule[] getMolecules () {
+		return molecules;
+	}
+	
+	public int[] getCoefficients () {
+		if (coefficients == null)
+			balance();
+		return coefficients;
+	}
 }
