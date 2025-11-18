@@ -23,6 +23,42 @@ public class Chemistry {
 		for (int i = 0; i < masses.length; i++) {
 			System.out.println(masses[i]);
 		}
+		
+		double pressure = 1;			// Atmospheres
+		double volume = 5;				// Liters
+		double amount = 0.2;			// Moles
+		double temperature = chem.getTemperature(pressure, volume, amount);
+		System.out.println("Temperature = " + K2F(temperature));
+		
+		double temp = 100;
+		System.out.println(K2F(temp));
+		System.out.println(K2C(temp));
+		
+		System.out.println(toK(temp,"F"));
+		
+		Quantity tempQ = new Quantity("0C");
+		tempQ.to("F");
+		tempQ.display(3);
+		tempQ.to("K");
+		tempQ.display(3);
+		tempQ.to("C");
+		tempQ.display(3);
+		
+		Quantity presQ = new Quantity("10mmHg");
+		presQ.to("mmHg");
+		presQ.display();
+		presQ.to("atm");
+		presQ.display();
+		presQ.to("Pa");
+		presQ.display();
+		
+		Quantity volQ = new Quantity("10in^3");
+		volQ.to("L");
+		volQ.display();
+		volQ.to("mm^3");
+		volQ.display();
+		volQ.to("in^3");
+		volQ.display();
 	}
 	
 	private PeriodicTable pTable;
@@ -72,4 +108,52 @@ public class Chemistry {
 		}
 		return result;
 	}
+	
+	public double getPressure (double volumeL, double amountMol, double temperatureK) {
+		return amountMol * 0.08206 * temperatureK / volumeL;
+	}
+	
+	public double getVolume (double pressureAtm, double amountMol, double temperatureK) {
+		return amountMol * 0.08206 * temperatureK / pressureAtm;
+	}
+	
+	public double getNumMoles (double pressureAtm, double volume, double temperatureK) {
+		return pressureAtm * volume / (0.08206 * temperatureK) ;
+	}
+	
+	public double getTemperature (double pressureAtm, double volume, double amountMol) {
+		return pressureAtm * volume / (0.08206 * amountMol);
+	}
+	
+	public static double C2F(double temp) {
+		return temp * 9/5 + 32;
+	}
+	public static double F2C(double temp) {
+		return (temp - 32) * 5/9;
+	}
+	public static double C2K(double temp) {
+		return temp + 273.15;
+	}
+	public static double K2C(double temp) {
+		return temp - 273.15;
+	}
+	public static double F2K(double temp) {
+		return C2K(F2C(temp));
+	}
+	public static double K2F(double temp) {
+		return C2F(K2C(temp));
+	}
+	
+	public static double toK(double temp, String unit) {
+		if (unit.equals("F")) {
+			temp = (temp - 32) * 5/9;
+			unit = "C";
+		}
+		if (unit.equals("C")) {
+			temp += 273.15;
+			unit = "K";
+		}
+		return temp;
+	}
+	
 }
